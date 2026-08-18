@@ -41,6 +41,10 @@ export function startOfWeek(value: string): string {
   return addDays(value, -weekday);
 }
 
+export function endOfWeek(value: string): string {
+  return addDays(startOfWeek(value), 6);
+}
+
 export function startOfMonth(value: string): string {
   const date = fromIsoDate(value);
   return toIsoDate(new Date(date.getFullYear(), date.getMonth(), 1));
