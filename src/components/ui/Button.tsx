@@ -1,10 +1,10 @@
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
-type Size = "sm" | "md";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonSize = "sm" | "md";
 
-const VARIANTS: Record<Variant, string> = {
+const VARIANTS: Record<ButtonVariant, string> = {
   primary:
     "bg-accent text-white hover:bg-accent-hover border border-transparent shadow-sm",
   secondary:
@@ -15,14 +15,33 @@ const VARIANTS: Record<Variant, string> = {
     "bg-transparent text-danger border border-border hover:bg-danger-soft hover:border-danger",
 };
 
-const SIZES: Record<Size, string> = {
+const SIZES: Record<ButtonSize, string> = {
   sm: "h-8 px-3 text-xs gap-1.5",
   md: "h-10 px-4 text-sm gap-2",
 };
 
+export function buttonClasses({
+  variant = "secondary",
+  size = "md",
+  className,
+}: {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  className?: string;
+} = {}): string {
+  return cn(
+    "inline-flex items-center justify-center rounded-lg font-medium transition-colors",
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+    "disabled:pointer-events-none disabled:opacity-50",
+    VARIANTS[variant],
+    SIZES[size],
+    className,
+  );
+}
+
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
-  size?: Size;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 }
 
 export function Button({
@@ -33,17 +52,6 @@ export function Button({
   ...props
 }: ButtonProps) {
   return (
-    <button
-      type={type}
-      className={cn(
-        "inline-flex items-center justify-center rounded-lg font-medium transition-colors",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
-        "disabled:pointer-events-none disabled:opacity-50",
-        VARIANTS[variant],
-        SIZES[size],
-        className,
-      )}
-      {...props}
-    />
+    <button type={type} className={buttonClasses({ variant, size, className })} {...props} />
   );
 }
