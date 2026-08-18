@@ -24,7 +24,6 @@ export default async function ProblemsPage({
       <PageHeader
         title="Problems"
         description="Everything you have completed, in one searchable list."
-        actions={<AddProblemButton />}
       />
 
       <ProblemFilters

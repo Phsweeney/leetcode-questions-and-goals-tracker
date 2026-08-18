@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { ActivityCalendar } from "@/components/ActivityCalendar";
-import { AddProblemButton } from "@/components/AddProblemButton";
 import { Badge } from "@/components/ui/Badge";
 import { getDayDetail, listActivity } from "@/lib/repos/stats";
 import {
@@ -38,7 +37,6 @@ export default async function CalendarPage({
       <PageHeader
         title="Calendar"
         description="Every day you completed something new or came back for another attempt."
-        actions={<AddProblemButton />}
       />
 
       <div className="grid gap-5 lg:grid-cols-5">

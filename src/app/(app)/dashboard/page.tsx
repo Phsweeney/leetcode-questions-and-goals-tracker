@@ -33,7 +33,7 @@ export default function DashboardPage() {
   if (stats.totalProblems === 0) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Dashboard" actions={<AddProblemButton />} />
+        <PageHeader title="Dashboard" />
         <EmptyState
           title="Nothing tracked yet"
           description="Add a problem you have already completed and your statistics, calendar, and goals will start filling in."
@@ -48,7 +48,6 @@ export default function DashboardPage() {
       <PageHeader
         title="Dashboard"
         description="A quick look at how your practice is going."
-        actions={<AddProblemButton />}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
