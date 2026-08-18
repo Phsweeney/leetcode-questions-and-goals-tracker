@@ -1,13 +1,20 @@
 import { PageHeader } from "@/components/PageHeader";
+import { ActivityCalendar } from "@/components/ActivityCalendar";
 import { AddProblemButton } from "@/components/AddProblemButton";
 import { StatCard, DifficultyBreakdown } from "@/components/StatCard";
 import { ProblemsTable } from "@/components/ProblemsTable";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LinkButton } from "@/components/ui/LinkButton";
-import { getDashboardStats } from "@/lib/repos/stats";
+import { getDashboardStats, listActivity } from "@/lib/repos/stats";
 import { listProblems } from "@/lib/repos/problems";
 import { DEFAULT_QUERY } from "@/lib/problemQuery";
-import { todayLocal } from "@/lib/dates";
+import {
+  endOfMonth,
+  endOfWeek,
+  startOfMonth,
+  startOfWeek,
+  todayLocal,
+} from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +22,10 @@ export default function DashboardPage() {
   const today = todayLocal();
   const stats = getDashboardStats(today);
   const recent = listProblems(DEFAULT_QUERY).slice(0, 5);
+  const activity = listActivity(
+    startOfWeek(startOfMonth(today)),
+    endOfWeek(endOfMonth(today)),
+  );
 
   if (stats.totalProblems === 0) {
     return (
@@ -63,6 +74,13 @@ export default function DashboardPage() {
           />
         </div>
       </div>
+
+      <ActivityCalendar
+        monthAnchor={today}
+        activity={activity}
+        basePath="/calendar"
+        showNavigation={false}
+      />
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
