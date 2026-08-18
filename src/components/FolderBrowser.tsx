@@ -31,11 +31,15 @@ interface BrowseResult {
 export function FolderBrowser({
   initialPath,
   confirmLabel = "Use This Folder",
+  mode = "apply",
   onDone,
+  onSelectPath,
 }: {
   initialPath?: string;
   confirmLabel?: string;
+  mode?: "apply" | "select";
   onDone?: () => void;
+  onSelectPath?: (path: string) => void;
 }) {
   const router = useRouter();
   const [result, setResult] = useState<BrowseResult | null>(null);
@@ -60,7 +64,13 @@ export function FolderBrowser({
 
   const currentPath = result?.path ?? "";
   const inspection = result?.inspection;
-  const canUse = inspection?.status === "valid" || inspection?.status === "empty";
+
+  // Applying accepts an existing data folder or an empty one. Selecting a
+  // restore target only accepts an empty folder.
+  const canConfirm =
+    mode === "select"
+      ? inspection?.status === "empty"
+      : inspection?.status === "valid" || inspection?.status === "empty";
 
   function handleCreate() {
     if (!currentPath) {
@@ -78,19 +88,24 @@ export function FolderBrowser({
     });
   }
 
-  function handleUse() {
+  function handleConfirm() {
     if (!currentPath) {
       return;
     }
+
+    if (mode === "select") {
+      onSelectPath?.(currentPath);
+      setMessage(null);
+      return;
+    }
+
     startTransition(async () => {
       const applied = await useDataFolder(currentPath);
       if (!applied.ok) {
         setMessage(applied.error ?? "Could not use that folder.");
         return;
       }
-      if (onDone) {
-        onDone();
-      }
+      onDone?.();
       router.replace("/dashboard");
       router.refresh();
     });
@@ -157,15 +172,19 @@ export function FolderBrowser({
         <p
           className={cn(
             "text-sm",
-            inspection.status === "valid" && "text-easy",
+            inspection.status === "valid" && (mode === "select" ? "text-danger" : "text-easy"),
             inspection.status === "empty" && "text-content-muted",
             inspection.status === "not-a-data-folder" && "text-danger",
           )}
         >
           {inspection.status === "valid" &&
-            "This is a LeetTrack data folder. Your existing data will be loaded."}
+            (mode === "select"
+              ? "This folder already holds LeetTrack data. Pick an empty folder instead."
+              : "This is a LeetTrack data folder. Your existing data will be loaded.")}
           {inspection.status === "empty" &&
-            "This folder is empty. A new LeetTrack data folder will be set up here."}
+            (mode === "select"
+              ? "This folder is empty and can receive the backup."
+              : "This folder is empty. A new LeetTrack data folder will be set up here.")}
           {inspection.status === "not-a-data-folder" && inspection.reason}
           {inspection.status === "missing" && "This folder does not exist."}
         </p>
@@ -196,8 +215,8 @@ export function FolderBrowser({
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="primary" onClick={handleUse} disabled={!canUse || pending}>
-            {pending ? "Working" : confirmLabel}
+          <Button variant="primary" onClick={handleConfirm} disabled={!canConfirm || pending}>
+            {pending ? "Working" : mode === "select" ? "Select This Folder" : confirmLabel}
           </Button>
           <Button onClick={() => setCreating(true)} disabled={!currentPath || pending}>
             Create New Folder Here
