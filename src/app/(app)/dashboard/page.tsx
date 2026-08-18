@@ -1,11 +1,13 @@
 import { PageHeader } from "@/components/PageHeader";
 import { ActivityCalendar } from "@/components/ActivityCalendar";
+import { GoalCard } from "@/components/GoalCard";
 import { AddProblemButton } from "@/components/AddProblemButton";
 import { StatCard, DifficultyBreakdown } from "@/components/StatCard";
 import { ProblemsTable } from "@/components/ProblemsTable";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LinkButton } from "@/components/ui/LinkButton";
 import { getDashboardStats, listActivity } from "@/lib/repos/stats";
+import { listActiveGoals } from "@/lib/repos/goals";
 import { listProblems } from "@/lib/repos/problems";
 import { DEFAULT_QUERY } from "@/lib/problemQuery";
 import {
@@ -26,6 +28,7 @@ export default function DashboardPage() {
     startOfWeek(startOfMonth(today)),
     endOfWeek(endOfMonth(today)),
   );
+  const goals = listActiveGoals(today);
 
   if (stats.totalProblems === 0) {
     return (
@@ -74,6 +77,22 @@ export default function DashboardPage() {
           />
         </div>
       </div>
+
+      {goals.length > 0 ? (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium text-content">Active goals</h2>
+            <LinkButton href="/goals" size="sm" variant="ghost">
+              Manage goals
+            </LinkButton>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {goals.map((goal) => (
+              <GoalCard key={goal.id} goal={goal} />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <ActivityCalendar
         monthAnchor={today}
