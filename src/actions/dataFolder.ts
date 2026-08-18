@@ -5,6 +5,7 @@ import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { setConfiguredDataDir, isDataDirLockedByEnv } from "@/lib/config";
 import { inspectFolder, openDataFolder } from "@/lib/fs/dataFolder";
+import { validateFolderName } from "@/lib/fs/folderName";
 
 export interface ActionResult {
   ok: boolean;
@@ -15,15 +16,12 @@ export async function createFolder(
   parentPath: string,
   name: string,
 ): Promise<ActionResult & { path?: string }> {
-  const trimmed = name.trim();
-  if (trimmed.length === 0) {
-    return { ok: false, error: "Enter a folder name." };
-  }
-  if (/[\/:*?"<>|]/.test(trimmed)) {
-    return { ok: false, error: "Folder names cannot contain these characters: \ / : * ? \" < > |" };
+  const problem = validateFolderName(name);
+  if (problem) {
+    return { ok: false, error: problem };
   }
 
-  const target = path.join(path.resolve(parentPath), trimmed);
+  const target = path.join(path.resolve(parentPath), name.trim());
   if (fs.existsSync(target)) {
     return { ok: false, error: "A folder with that name already exists here." };
   }
