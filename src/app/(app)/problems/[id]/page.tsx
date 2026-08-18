@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
 import { DifficultyBadge } from "@/components/DifficultyBadge";
 import { ProblemActions } from "@/components/ProblemActions";
+import { RepeatModal } from "@/components/RepeatModal";
+import { ReviewHistory } from "@/components/ReviewHistory";
 import { getProblemDetail } from "@/lib/repos/problems";
-import { formatLongDate } from "@/lib/dates";
+import { formatLongDate, todayLocal } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +61,11 @@ export default async function ProblemDetailPage({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <RepeatModal
+            problemId={problem.id}
+            today={todayLocal()}
+            minDate={problem.completedDate}
+          />
           <ProblemActions id={problem.id} title={problem.title} />
         </div>
       </div>
@@ -95,6 +102,13 @@ export default async function ProblemDetailPage({
 
       <Section title="Notes">
         <ProseBlock text={problem.notes} fallback="No notes yet. Use Edit to add some." />
+      </Section>
+
+      <Section title={`Review history, ${problem.repeats.length + 1} entries`}>
+        <ReviewHistory
+          completedDate={problem.completedDate}
+          repeats={problem.repeats}
+        />
       </Section>
     </div>
   );
