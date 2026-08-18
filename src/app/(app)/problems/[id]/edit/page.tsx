@@ -32,7 +32,7 @@ export default async function EditProblemPage({
         problem={problem}
         defaultCompletedDate={todayLocal()}
         submitLabel="Save changes"
-        cancelHref="/problems"
+        cancelHref={`/problems/${problem.id}`}
       />
     </div>
   );

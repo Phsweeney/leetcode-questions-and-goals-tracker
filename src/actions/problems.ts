@@ -67,7 +67,7 @@ export async function saveNewProblem(
 
   const id = createProblem(parsed.data);
   revalidateProblemViews(id);
-  redirect("/problems");
+  redirect(`/problems/${id}`);
 }
 
 export async function saveExistingProblem(
@@ -86,7 +86,7 @@ export async function saveExistingProblem(
 
   updateProblem(id, parsed.data);
   revalidateProblemViews(id);
-  redirect("/problems");
+  redirect(`/problems/${id}`);
 }
 
 export async function removeProblem(id: number): Promise<void> {
