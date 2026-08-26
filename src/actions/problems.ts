@@ -9,6 +9,8 @@ import {
   updateProblem,
 } from "@/lib/repos/problems";
 import { problemInputSchema } from "@/lib/schemas";
+import { syncAchievements, syncAndCelebrate } from "@/lib/progress/sync";
+import { xpForProblem } from "@/lib/progress/xp";
 import { DIFFICULTIES, type Difficulty } from "@/lib/types";
 
 export interface FormState {
@@ -51,6 +53,7 @@ function revalidateProblemViews(id?: number): void {
   revalidatePath("/calendar");
   revalidatePath("/goals");
   revalidatePath("/tags");
+  revalidatePath("/progress");
   if (id) {
     revalidatePath(`/problems/${id}`);
   }
@@ -66,6 +69,11 @@ export async function saveNewProblem(
   }
 
   const id = createProblem(parsed.data);
+  syncAndCelebrate({
+    kind: "problem",
+    title: parsed.data.title,
+    xpGained: xpForProblem(parsed.data.difficulty),
+  });
   revalidateProblemViews(id);
   redirect(`/problems/${id}`);
 }
@@ -85,12 +93,16 @@ export async function saveExistingProblem(
   }
 
   updateProblem(id, parsed.data);
+  // An edit can change difficulty, and so the xp total a badge is measured on.
+  syncAchievements();
   revalidateProblemViews(id);
   redirect(`/problems/${id}`);
 }
 
 export async function removeProblem(id: number): Promise<void> {
   deleteProblem(id);
+  // Badges are never revoked, so this only ever picks up new ones.
+  syncAchievements();
   revalidateProblemViews(id);
   redirect("/problems");
 }

@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { addRepeat, deleteRepeat, getRepeat } from "@/lib/repos/repeats";
 import { getProblem } from "@/lib/repos/problems";
 import { repeatInputSchema } from "@/lib/schemas";
+import { syncAchievements, syncAndCelebrate } from "@/lib/progress/sync";
+import { xpForRepeat } from "@/lib/progress/xp";
 
 export interface RepeatResultState {
   ok: boolean;
@@ -15,6 +17,7 @@ function revalidateRepeatViews(problemId: number): void {
   revalidatePath("/problems");
   revalidatePath("/dashboard");
   revalidatePath("/calendar");
+  revalidatePath("/progress");
 }
 
 export async function saveRepeat(input: {
@@ -39,6 +42,11 @@ export async function saveRepeat(input: {
   }
 
   addRepeat(parsed.data);
+  syncAndCelebrate({
+    kind: "repeat",
+    title: problem.title,
+    xpGained: xpForRepeat(parsed.data.result),
+  });
   revalidateRepeatViews(parsed.data.problemId);
   return { ok: true };
 }
@@ -50,6 +58,7 @@ export async function removeRepeat(id: number): Promise<RepeatResultState> {
   }
 
   deleteRepeat(id);
+  syncAchievements();
   revalidateRepeatViews(repeat.problemId);
   return { ok: true };
 }
