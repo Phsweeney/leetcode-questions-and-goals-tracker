@@ -7,6 +7,7 @@ import { cn } from "@/lib/cn";
 
 const PRIMARY_LINKS = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/progress", label: "Progress" },
   { href: "/problems", label: "Problems" },
   { href: "/tags", label: "Tags" },
   { href: "/goals", label: "Goals" },

@@ -2,21 +2,9 @@ import Link from "next/link";
 import { addMonths, formatMonthTitle, fromIsoDate, monthGrid, todayLocal } from "@/lib/dates";
 import type { DayActivity } from "@/lib/types";
 import { cn } from "@/lib/cn";
+import { intensityClass } from "@/lib/progress/intensity";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-function intensityClass(total: number): string {
-  if (total === 0) {
-    return "bg-surface-sunken text-content-subtle";
-  }
-  if (total === 1) {
-    return "bg-accent/25 text-content";
-  }
-  if (total <= 3) {
-    return "bg-accent/50 text-content";
-  }
-  return "bg-accent text-white";
-}
 
 export function ActivityCalendar({
   monthAnchor,
