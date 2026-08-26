@@ -99,6 +99,44 @@ export function calculateStreak(activeDates: Iterable<string>, today: string): n
   return streak;
 }
 
+// ISO date strings sort chronologically, so a plain sort is enough to walk a
+// log in order.
+function sortedUniqueDates(activeDates: Iterable<string>): string[] {
+  return [...new Set(activeDates)].sort();
+}
+
+export function longestStreak(activeDates: Iterable<string>): number {
+  let longest = 0;
+  let run = 0;
+  let previous: string | null = null;
+
+  for (const date of sortedUniqueDates(activeDates)) {
+    run = previous !== null && addDays(previous, 1) === date ? run + 1 : 1;
+    previous = date;
+    if (run > longest) {
+      longest = run;
+    }
+  }
+
+  return longest;
+}
+
+// The number of fully inactive days in the widest quiet stretch between two
+// active days. A log with fewer than two active days has no gap to measure.
+export function longestGap(activeDates: Iterable<string>): number {
+  const dates = sortedUniqueDates(activeDates);
+  let longest = 0;
+
+  for (let index = 1; index < dates.length; index += 1) {
+    const gap = daysBetween(dates[index - 1], dates[index]) - 1;
+    if (gap > longest) {
+      longest = gap;
+    }
+  }
+
+  return longest;
+}
+
 export interface CalendarCell {
   date: string;
   inMonth: boolean;

@@ -3,6 +3,8 @@ import {
   addDays,
   addMonths,
   calculateStreak,
+  longestGap,
+  longestStreak,
   daysBetween,
   endOfMonth,
   formatLongDate,
@@ -131,5 +133,56 @@ describe("month grid", () => {
     const july = cells.find((cell) => cell.date === "2026-07-31");
 
     expect(july?.inMonth).toBe(false);
+  });
+});
+
+describe("longest streak", () => {
+  it("returns zero for an empty log", () => {
+    expect(longestStreak([])).toBe(0);
+  });
+
+  it("counts a single active day as a streak of one", () => {
+    expect(longestStreak(["2026-08-18"])).toBe(1);
+  });
+
+  it("finds the longest run rather than the most recent one", () => {
+    const dates = [
+      "2026-08-01",
+      "2026-08-02",
+      "2026-08-03",
+      "2026-08-04",
+      "2026-08-10",
+      "2026-08-11",
+    ];
+
+    expect(longestStreak(dates)).toBe(4);
+  });
+
+  it("ignores duplicate entries for the same day", () => {
+    expect(longestStreak(["2026-08-18", "2026-08-18", "2026-08-19"])).toBe(2);
+  });
+
+  it("counts across a month and a year boundary", () => {
+    expect(longestStreak(["2026-01-31", "2026-02-01", "2026-02-02"])).toBe(3);
+    expect(longestStreak(["2025-12-31", "2026-01-01"])).toBe(2);
+  });
+});
+
+describe("longest gap", () => {
+  it("has no gap to measure with fewer than two active days", () => {
+    expect(longestGap([])).toBe(0);
+    expect(longestGap(["2026-08-18"])).toBe(0);
+  });
+
+  it("counts only the fully inactive days between two active days", () => {
+    expect(longestGap(["2026-08-18", "2026-08-19"])).toBe(0);
+    expect(longestGap(["2026-08-18", "2026-08-20"])).toBe(1);
+    expect(longestGap(["2026-08-01", "2026-08-09"])).toBe(7);
+  });
+
+  it("returns the widest quiet stretch", () => {
+    const dates = ["2026-08-01", "2026-08-03", "2026-08-20", "2026-08-21"];
+
+    expect(longestGap(dates)).toBe(16);
   });
 });
