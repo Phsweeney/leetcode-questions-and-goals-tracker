@@ -69,8 +69,34 @@ INSERT INTO platform (name, created_at) VALUES
   ('Other', datetime('now'));
 `;
 
+const progress = `
+CREATE TABLE achievement (
+  key         TEXT PRIMARY KEY,
+  unlocked_at TEXT NOT NULL,
+  seen_at     TEXT
+);
+
+-- Single-row scratchpad describing the most recent rewardable action, written by
+-- a mutation and consumed once by the celebration overlay.
+CREATE TABLE celebration (
+  id            INTEGER PRIMARY KEY CHECK (id = 1),
+  created_at    TEXT NOT NULL,
+  kind          TEXT NOT NULL CHECK (kind IN ('problem','repeat')),
+  title         TEXT NOT NULL,
+  xp_gained     INTEGER NOT NULL,
+  xp_total      INTEGER NOT NULL,
+  level_before  INTEGER NOT NULL,
+  level_after   INTEGER NOT NULL,
+  streak        INTEGER NOT NULL,
+  unlocked_keys TEXT NOT NULL DEFAULT '[]'
+);
+
+CREATE INDEX idx_achievement_unseen ON achievement(seen_at);
+`;
+
 export const MIGRATIONS: Migration[] = [
   { version: 1, name: "init", sql: init },
+  { version: 2, name: "progress", sql: progress },
 ];
 
 export const SCHEMA_VERSION = MIGRATIONS.reduce(
